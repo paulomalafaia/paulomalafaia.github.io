@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<base target="_top">
+	<script type="text/javascript">
+		window.hfAccountId = "d77c726c-d77d-4d81-a41d-322619816e5d";
+    window.hfDomain = "https://api.herefish.com";
+    (function() {
+        var hf = document.createElement('script'); hf.type = 'text/javascript'; hf.async = true;
+        hf.src = window.hfDomain + '/scripts/hf.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(hf, s);
+    })();
+	</script>
+      <!--External Library that allows the "posting" of messages from the page in the iFrame to "listeners" in Bullhorn -->
+    <script src="https://cdn.rawgit.com/krakenjs/post-robot/7da06445/dist/post-robot.js"></script>
+</head>
+
+<body>
+
+	<h1>This is a proof of concept for TK</h1>
+	<script>
+		//postRobot is the JS object instantiated to make calls to the BH app hosting the iFrame
+    postRobot.CONFIG.LOG_LEVEL = 'error';
+
+    //Register the "Post Robot" so we can make calls to BH
+    postRobot.sendToParent('register', {
+        title: 'Custom Title',
+        url: window.location.href,
+        color: 'red'
+    }).then(function (event) {
+        console.log('[No-App] - Register Complete', event);
+        const queryString = window.location.search;
+        console.log(queryString);
+        const urlParams = new URLSearchParams(queryString);
+        const candidateId = urlParams.get('EntityID');
+        console.log(candidateId);
+        openSMS(candidateId);
+    });
+
+function openSMS(id){
+    //Call the "Open" listener in BH via postRobot (in BH this is called AppBridge)
+    postRobot.sendToParent('open', {
+        type: 'custom',
+        data: {
+          url: `https://manpower-france-extensions-qa.s3.amazonaws.com/index.html#custom-sms?EntityType=Candidate&EntityID=${id}`,
+        },
+    })
+}
+        
+	</script>
+</body>
+
+</html>
